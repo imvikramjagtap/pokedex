@@ -1,24 +1,31 @@
-import React, { useState } from 'react';
-import { createUseStyles } from 'react-jss';
+import { useState } from 'react';
 import { Pokemon, useGetPokemons } from '../../hooks/useGetPokemons';
+import { useNavigate, useParams } from 'react-router-dom';
+import { createUseStyles } from 'react-jss';
+import { PokemonDetailsDialog } from '../PokemonView';
 
-export const PokemonList: React.FC = () => {
+export const PokemonList = () => {
   const classes = useStyles();
   const { pokemons, loading } = useGetPokemons();
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
   // Filter pokemons based on search term
-  const filteredPokemons = pokemons.filter((pkmn) => 
-    pkmn.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pkmn.number.includes(searchTerm)
+  const filteredPokemons = pokemons.filter(
+    (pkmn) =>
+      pkmn.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pkmn.number.includes(searchTerm)
   );
+
+  const params = useParams();
+  const pokemonName = params.pokemonName || '';
 
   return (
     <div className={classes.root}>
       <div className={classes.searchContainer}>
-        <input 
-          type="text" 
-          placeholder="Search Pokémon by name or number" 
+        <input
+          type="text"
+          placeholder="Search Pokémon by name or number"
           className={classes.searchInput}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -36,7 +43,11 @@ export const PokemonList: React.FC = () => {
           ) : (
             <div className={classes.pokemonGrid}>
               {filteredPokemons.map((pkmn: Pokemon) => (
-                <div key={pkmn.id} className={classes.pokemonCard}>
+                <div
+                  key={pkmn.id}
+                  className={classes.pokemonCard}
+                  onClick={() => navigate(`/pokemon/${pkmn.name}`)}
+                >
                   <img
                     src={pkmn.image}
                     alt={pkmn.name}
@@ -47,10 +58,7 @@ export const PokemonList: React.FC = () => {
                     <p className={classes.pokemonNumber}>#{pkmn.number}</p>
                     <div className={classes.pokemonTypes}>
                       {pkmn.types.map((type) => (
-                        <span
-                          key={type}
-                          className={`${classes.pokemonType}`}
-                        >
+                        <span key={type} className={`${classes.pokemonType}`}>
                           {type}
                         </span>
                       ))}
@@ -62,6 +70,7 @@ export const PokemonList: React.FC = () => {
           )}
         </>
       )}
+      <PokemonDetailsDialog pokemonName={pokemonName} />
     </div>
   );
 };
@@ -73,7 +82,7 @@ const useStyles = createUseStyles(
       padding: '32px',
       boxSizing: 'border-box',
       backgroundColor: '#f5f5f5',
-      minHeight: '100vh'
+      minHeight: '100vh',
     },
     searchContainer: {
       display: 'flex',
@@ -123,7 +132,7 @@ const useStyles = createUseStyles(
       '&:hover': {
         transform: 'scale(1.05)',
         boxShadow: '0 8px 15px rgba(0, 0, 0, 0.2)',
-        cursor: 'pointer'
+        cursor: 'pointer',
       },
     },
     pokemonImage: {
