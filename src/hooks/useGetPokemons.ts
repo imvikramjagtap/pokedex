@@ -5,6 +5,10 @@ import gql from 'graphql-tag';
 export type Pokemon = {
   id: string;
   name: string;
+  number: string;
+  types: string[];
+  image: string;
+  __typename?: string;
 };
 
 export type PokemonOption = {
