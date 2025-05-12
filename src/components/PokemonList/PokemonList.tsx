@@ -1,42 +1,66 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { Pokemon, useGetPokemons } from '../../hooks/useGetPokemons';
-
 
 export const PokemonList: React.FC = () => {
   const classes = useStyles();
   const { pokemons, loading } = useGetPokemons();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filter pokemons based on search term
+  const filteredPokemons = pokemons.filter((pkmn) => 
+    pkmn.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    pkmn.number.includes(searchTerm)
+  );
 
   return (
     <div className={classes.root}>
+      <div className={classes.searchContainer}>
+        <input 
+          type="text" 
+          placeholder="Search Pokémon by name or number" 
+          className={classes.searchInput}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
       {loading ? (
         <div className={classes.loading}>Loading Pokémon...</div>
       ) : (
-        <div className={classes.pokemonGrid}>
-          {pokemons.map((pkmn: Pokemon) => (
-            <div key={pkmn.id} className={classes.pokemonCard}>
-              <img
-                src={pkmn.image}
-                alt={pkmn.name}
-                className={classes.pokemonImage}
-              />
-              <div className={classes.pokemonInfo}>
-                <h3 className={classes.pokemonName}>{pkmn.name}</h3>
-                <p className={classes.pokemonNumber}>#{pkmn.number}</p>
-                <div className={classes.pokemonTypes}>
-                  {pkmn.types.map((type) => (
-                    <span
-                      key={type}
-                      className={`${classes.pokemonType}`}
-                    >
-                      {type}
-                    </span>
-                  ))}
-                </div>
-              </div>
+        <>
+          {filteredPokemons.length === 0 ? (
+            <div className={classes.noResults}>
+              No Pokémon found matching your search
             </div>
-          ))}
-        </div>
+          ) : (
+            <div className={classes.pokemonGrid}>
+              {filteredPokemons.map((pkmn: Pokemon) => (
+                <div key={pkmn.id} className={classes.pokemonCard}>
+                  <img
+                    src={pkmn.image}
+                    alt={pkmn.name}
+                    className={classes.pokemonImage}
+                  />
+                  <div className={classes.pokemonInfo}>
+                    <h3 className={classes.pokemonName}>{pkmn.name}</h3>
+                    <p className={classes.pokemonNumber}>#{pkmn.number}</p>
+                    <div className={classes.pokemonTypes}>
+                      {pkmn.types.map((type) => (
+                        <span
+                          key={type}
+                          className={`${classes.pokemonType}`}
+                        >
+                          {type}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -49,11 +73,38 @@ const useStyles = createUseStyles(
       padding: '32px',
       boxSizing: 'border-box',
       backgroundColor: '#f5f5f5',
+      minHeight: '100vh'
+    },
+    searchContainer: {
+      display: 'flex',
+      justifyContent: 'center',
+      marginBottom: '20px',
+    },
+    searchInput: {
+      width: '100%',
+      maxWidth: '500px',
+      color: 'black',
+      padding: '10px',
+      fontSize: '1rem',
+      borderRadius: '20px',
+      border: '1px solid #ddd',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      '&:focus': {
+        outline: 'none',
+        borderColor: '#666',
+        boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+      },
     },
     loading: {
       textAlign: 'center',
       fontSize: '1.5rem',
       color: '#888',
+      padding: '20px',
+    },
+    noResults: {
+      textAlign: 'center',
+      fontSize: '1.2rem',
+      color: '#666',
       padding: '20px',
     },
     pokemonGrid: {
