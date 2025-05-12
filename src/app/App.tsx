@@ -2,10 +2,11 @@ import React from 'react';
 import { createUseStyles } from 'react-jss';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { LayoutProvider } from '../contexts';
-import { Nav } from '../components';
+import { Nav, PokemonList } from '../components';
 import { ApolloProvider } from '@apollo/client';
 import { client } from './client';
 import { ListPage, Home } from '../screens';
+import { PokemonDetailsDialog } from '../components/PokemonView';
 
 function App() {
   const classes = useStyles();
@@ -20,6 +21,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/pokemon" element={<ListPage />} />
+                  <Route path="/pokemon/:pokemonName" element={<ListPage />} />
                 </Routes>
               </div>
             </div>
